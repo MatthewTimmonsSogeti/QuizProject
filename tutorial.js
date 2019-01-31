@@ -1,11 +1,15 @@
 (function scopeWrapper($) {
     
     $(document).ready(function(){
-       getInitialQuestions();
+       getQuestions();
        callForQuote();
     });
 
     let currentQuestions = [];
+    let score = 19;
+    let currentEasyCount = 4;
+    let currentMediumCount = 3;
+    let currentHardCount = 3;
     
     function callForQuestions() {
         $.ajax({
@@ -16,10 +20,33 @@
         });
     }
 
-    function getInitialQuestions() {
-        callForQuestionsOfDifficulty(4, "easy");
-        callForQuestionsOfDifficulty(3, "medium");
-        callForQuestionsOfDifficulty(3, "hard");
+    function getQuestions() {
+        currentEasyCount = 0;
+        currentMediumCount = 0;
+        currentHardCount = 0;
+        let totalQuestions = 0;
+
+        while (score > 0 && totalQuestions < 10) {
+            if (score > 2) {
+                score -= 3;
+                currentHardCount++;
+                totalQuestions++;
+            }
+            if (score > 1 && totalQuestions < 10) {
+                score -= 2;
+                currentMediumCount++;
+                totalQuestions++;
+            }
+            if (score > 0 && totalQuestions < 10) {
+                score -= 1;
+                currentEasyCount++;
+                totalQuestions++;
+            }
+        }
+
+        callForQuestionsOfDifficulty(currentEasyCount, "easy");
+        callForQuestionsOfDifficulty(currentMediumCount, "medium");
+        callForQuestionsOfDifficulty(currentHardCount, "hard");
     }
 
     function callForQuestionsOfDifficulty(amount, difficulty) {
@@ -36,7 +63,7 @@
         console.log("CurrentQuestions: " + currentQuestions);
         console.log("Questions length: " + currentQuestions.length);
         console.log("First Question: " + atob(currentQuestions[0].question.toString()));
-        if (currentQuestions.length > 9) {
+        if (currentQuestions.length === 10) {
             currentQuestions = shuffle(currentQuestions);
             buildQuestionList(currentQuestions);
         }
@@ -60,7 +87,7 @@
             // a perfect score every time.
            var question = $("<div/>").addClass(`question border border-primary p-3 difficulty-${e.difficulty}`).appendTo($("#questionsList"));
            $("<h6/>").addClass("text-center").html("Question " + (i+1)).appendTo(question);
-           $("<span style='display:block'/>").html("Difficulty: " + atob(e.difficulty)).appendTo(question);
+           $("<span style='display:block'/>").html("Difficulty: " + atob(e.difficulty).toUpperCase()).appendTo(question);
            $("<span/>").addClass("text-secondary").html(atob(e.question)).appendTo(question);
            var answerDiv = $("<div/>").addClass("row answerDiv").appendTo(question);
            // TODO wouldn't it be better to shuffle the answers so that the
@@ -79,8 +106,42 @@
            if (len < 10) {
                alert("Please complete all ten questions to submit.")
            } else {
-               var right = $(".btn-info.correctAnswer").length;
-               alert("Well done, you got " + right + " right!");
+               let correctAnswers = $(".btn-info.correctAnswer");
+               const right = correctAnswers.length;
+               
+               score = 0;
+               correctAnswers.each(function(index){
+                   // Easy
+                    if (($(this).parent().parent()).hasClass("difficulty-ZWFzeQ==")) {
+                        score += 1;
+                    }
+                   // Medium
+                    if (($(this).parent().parent()).hasClass("difficulty-bWVkaXVt")) {
+                        score += 2;
+                    }
+                    // Hard 
+                    if (($(this).parent().parent()).hasClass("difficulty-aGFyZA==")) {
+                        score += 3;
+                    }
+               })
+
+            alert("Well done, you got " + right + " right!\nYou also got a score of " + score);
+
+               // Clear HTML 
+               $("#questionsList").empty();
+                // currentQuestions = [];
+                // currentEasyCount = 4;
+                // currentMediumCount = 3;
+                // currentHardCount = 3;
+            
+                currentQuestions = [];
+                // score += (right + (right-10));
+                // Temp - Reset score
+                score = 19;
+                getQuestions();
+               
+               // Get new questions
+
            }
         });
         $(".answer").click(function(e) {
@@ -90,15 +151,6 @@
            $(this).addClass("btn-info");
            $(this).removeClass("btn-primary");
         });
-    }
-    
-    function uuid4() {
-        const ho = (n, p) => n.toString(16).padStart(p, 0); 
-        const view = new DataView(new ArrayBuffer(16)); 
-        crypto.getRandomValues(new Uint8Array(view.buffer)); 
-        view.setUint8(6, (view.getUint8(6) & 0xf) | 0x40); 
-        view.setUint8(8, (view.getUint8(8) & 0x3f) | 0x80); 
-        return `${ho(view.getUint32(0), 8)}-${ho(view.getUint16(4), 4)}-${ho(view.getUint16(6), 4)}-${ho(view.getUint16(8), 4)}-${ho(view.getUint32(10), 8)}${ho(view.getUint16(14), 4)}`; 
     }
 
     // Took this shuffle function from here:
