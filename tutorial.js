@@ -12,6 +12,7 @@
             console.log(data);
             buildQuestionList(data);
         });
+
     }
     
     function callForQuote() {
@@ -30,18 +31,25 @@
             // TODO why is this code wrong? There are a LOT of reasons, but a
             // *hint* is to consider how someone with developer tools might get
             // a perfect score every time.
-           var question = $("<div/>").addClass("question border border-primary p-3").appendTo($("#questionsList"));
-           $("<h6/>").addClass("text-center").html("Question " + (i+1)).appendTo(question);
-           $("<span/>").addClass("text-secondary").html(atob(e.question)).appendTo(question);
-           var answerDiv = $("<div/>").addClass("row answerDiv").appendTo(question);
+           var question = $("<div/>").addClass("question p-3").appendTo($("#questionsList"));
+           $("<span/>").addClass("questionNumber").html(`${i+1}&nbsp;&nbsp;&nbsp;`).appendTo(question);
+           $("<span/>").addClass("question").html(atob(e.question)).appendTo(question);
+           $("<br><br>").appendTo(question);
+           var answerDiv = $("<div/>").addClass("answerDiv").appendTo(question);
            // TODO wouldn't it be better to shuffle the answers so that the
             // last one isn't always the right one? Just a thought...
            $.each(e.incorrect_answers,function(index,element){
-               $("<button/>").addClass("btn btn-primary form-control col-3 answer").html(atob(element)).appendTo(answerDiv);
-           });
-           $("<button/>").addClass("btn btn-primary form-control col-3 correctAnswer answer").html(atob(e.correct_answer)).appendTo(answerDiv);
+                $("<label class='radio'>").html(`<p>&nbsp;&nbsp;${atob(element)}</p>
+                <input type='radio' class='answer' name='question${i}'>
+                <span class='checkround'></span>`).appendTo(answerDiv);
+            });
+            $("<label class='radio'>").html(`<p>&nbsp;&nbsp;${atob(e.correct_answer)}</p>
+            <input type='radio' class='answer correctAnswer' name='question${i}'>
+            <span class='checkround'></span>`).appendTo(answerDiv);
         });
         var submit = $("<button/>").addClass("btn btn-secondary text-center form-control").html("Submit").appendTo($("#questionsList"));
+        
+        /*
         submit.click(function(e) {
            e.preventDefault(); 
            // TODO there is probably a better way to determine the right
@@ -54,13 +62,8 @@
                alert("Well done, you got " + right + " right!");
            }
         });
-        $(".answer").click(function(e) {
-           e.preventDefault(); 
-           $(this).parent().children().removeClass('btn-info');
-           $(this).parent().children().addClass('btn-primary');
-           $(this).addClass("btn-info");
-           $(this).removeClass("btn-primary");
-        });
+        */
+
     }
     
     function uuid4() {
