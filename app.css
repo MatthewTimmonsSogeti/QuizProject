@@ -37,6 +37,10 @@ p {
 }
 
 .question {
+    border-top: 1px solid dimgray;
+}
+
+.questionText {
     font-size: 14pt;
 }
 
@@ -50,6 +54,9 @@ p {
     text-align: center;
     color: dimgrey;
     font-size: 11pt;
+    background-color: white;
+    transform: translate(50%, -15px);
+    width: 150px;
 }
 
 button {

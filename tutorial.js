@@ -59,10 +59,12 @@
             // TODO why is this code wrong? There are a LOT of reasons, but a
             // *hint* is to consider how someone with developer tools might get
             // a perfect score every time.
-           var question = $("<div/>").addClass(`question difficulty-${e.difficulty}`).appendTo($("#questionsList"));
-           $("<span style='display:block'/>").addClass("difficulty").html("Difficulty: <em>" + atob(e.difficulty) + "</em>").appendTo(question);
+           var question = $(`<br><br><div class='question difficulty-${e.difficulty}'/>`).appendTo($("#questionsList"));
+
+           $(`<div class='text-center'><span style='display:block' class='difficulty'>Difficulty : <em>${atob(e.difficulty)}</em></span></div>`).appendTo(question);
+
            $("<span/>").addClass("questionNumber").html(`${i+1}&nbsp;&nbsp;&nbsp;`).appendTo(question);
-           $("<span/>").addClass("question").html(atob(e.question)).appendTo(question);
+           $("<span/>").addClass("questionText").html(atob(e.question)).appendTo(question);
            $("<br><br>").appendTo(question);
            var answerDiv = $("<div/>").addClass("answerDiv").appendTo(question);
            // TODO wouldn't it be better to shuffle the answers so that the
