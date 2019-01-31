@@ -1,9 +1,11 @@
 (function scopeWrapper($) {
     
     $(document).ready(function(){
-       callForQuestions(); 
+       getInitialQuestions();
        callForQuote();
     });
+
+    let currentQuestions = [];
     
     function callForQuestions() {
         $.ajax({
@@ -14,7 +16,33 @@
         });
 
     }
-    
+
+    function getInitialQuestions() {
+        callForQuestionsOfDifficulty(4, "easy");
+        callForQuestionsOfDifficulty(3, "medium");
+        callForQuestionsOfDifficulty(3, "hard");
+    }
+
+    function callForQuestionsOfDifficulty(amount, difficulty) {
+        $.ajax({
+            url: `https://opentdb.com/api.php?amount=${amount}&difficulty=${difficulty}&encode=base64`
+        }).done(function(data) {
+            console.log(data);
+            addQuestionsToQueue(data.results);
+        });
+    }
+
+    function addQuestionsToQueue(questions) {
+        currentQuestions = currentQuestions.concat(questions);
+        console.log("CurrentQuestions: " + currentQuestions);
+        console.log("Questions length: " + currentQuestions.length);
+        console.log("First Question: " + atob(currentQuestions[0].question.toString()));
+        if (currentQuestions.length > 9) {
+            currentQuestions = shuffle(currentQuestions);
+            buildQuestionList(currentQuestions);
+        }
+    }
+
     function callForQuote() {
         
         $.ajax({
@@ -26,12 +54,13 @@
     }
     
     function buildQuestionList(data) {
-        
-        $.each(data.results, function(i,e) {
+        console.log("Building");
+        $.each(data, function(i,e) {
             // TODO why is this code wrong? There are a LOT of reasons, but a
             // *hint* is to consider how someone with developer tools might get
             // a perfect score every time.
-           var question = $("<div/>").addClass("question p-3").appendTo($("#questionsList"));
+           var question = $("<div/>").addClass(`question difficulty-${e.difficulty} p-3`).appendTo($("#questionsList"));
+           $("<span style='display:block'/>").html("Difficulty: " + atob(e.difficulty)).appendTo(question);
            $("<span/>").addClass("questionNumber").html(`${i+1}&nbsp;&nbsp;&nbsp;`).appendTo(question);
            $("<span/>").addClass("question").html(atob(e.question)).appendTo(question);
            $("<br><br>").appendTo(question);
@@ -74,5 +103,31 @@
         view.setUint8(8, (view.getUint8(8) & 0x3f) | 0x80); 
         return `${ho(view.getUint32(0), 8)}-${ho(view.getUint16(4), 4)}-${ho(view.getUint16(6), 4)}-${ho(view.getUint16(8), 4)}-${ho(view.getUint32(10), 8)}${ho(view.getUint16(14), 4)}`; 
     }
+
+    // Took this shuffle function from here:
+    // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+    function shuffle(array) {
+        var currentIndex = array.length, temporaryValue, randomIndex;
+      
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+      
+          // Pick a remaining element...
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex -= 1;
+      
+          // And swap it with the current element.
+          temporaryValue = array[currentIndex];
+          array[currentIndex] = array[randomIndex];
+          array[randomIndex] = temporaryValue;
+        }
+      
+        return array;
+      }
+      
+      // Used like so
+      var arr = [2, 11, 37, 42];
+      arr = shuffle(arr);
+      console.log(arr);
 
 }(jQuery));
