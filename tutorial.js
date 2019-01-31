@@ -59,8 +59,8 @@
             // TODO why is this code wrong? There are a LOT of reasons, but a
             // *hint* is to consider how someone with developer tools might get
             // a perfect score every time.
-           var question = $("<div/>").addClass(`question difficulty-${e.difficulty} p-3`).appendTo($("#questionsList"));
-           $("<span style='display:block'/>").html("Difficulty: " + atob(e.difficulty)).appendTo(question);
+           var question = $("<div/>").addClass(`question difficulty-${e.difficulty}`).appendTo($("#questionsList"));
+           $("<span style='display:block'/>").addClass("difficulty").html("Difficulty: <em>" + atob(e.difficulty) + "</em>").appendTo(question);
            $("<span/>").addClass("questionNumber").html(`${i+1}&nbsp;&nbsp;&nbsp;`).appendTo(question);
            $("<span/>").addClass("question").html(atob(e.question)).appendTo(question);
            $("<br><br>").appendTo(question);
@@ -76,7 +76,7 @@
             <input type='radio' class='answer correctAnswer' name='question${i}'>
             <span class='checkround'></span>`).appendTo(answerDiv);
         });
-        var submit = $("<button/>").addClass("btn btn-secondary text-center form-control").html("Submit").appendTo($("#questionsList"));
+        var submit = $("<div class='text-center'><button class='btn btn-secondary'>Submit</button></div>").appendTo($("#questionsList"));
         
         /*
         submit.click(function(e) {

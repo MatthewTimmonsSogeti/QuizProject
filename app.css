@@ -8,6 +8,29 @@
        url('Constantia.svg#svgFontName') format('svg'); /* Legacy iOS */
 }
 
+html {
+    margin: 20px;
+}
+
+.titleContainer {
+    position: relative;
+  text-align: center;
+}
+
+.bam {
+    width: 140px;
+
+}
+
+.quizTitle {
+    position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #f8204f;
+  transform: skewY(-20deg) translate(-28px, -35px);
+}
+
 p {
     font-size: 11pt;
     color: dimgrey;
@@ -23,6 +46,16 @@ p {
     font-size: 24pt;
 }
 
+.difficulty {
+    text-align: center;
+    color: dimgrey;
+    font-size: 11pt;
+}
+
+button {
+    width: 80px;
+    margin: 0 auto;
+}
 
 
 /*////// code from https://bootsnipp.com/snippets/O5oAl //////*/
