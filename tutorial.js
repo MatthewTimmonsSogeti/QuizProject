@@ -5,6 +5,10 @@
        callForQuote();
     });
 
+    // Debug flag
+    let debug = false;
+    // debug = true;
+    
     let currentQuestions = [];
     let score = 19;
     let currentEasyCount = 4;
@@ -94,16 +98,24 @@
             $("<br><br>").appendTo(question);
             var answerDiv = $("<div/>").addClass("answerDiv").appendTo(question);
 
-            // TODO wouldn't it be better to shuffle the answers so that the
-            // last one isn't always the right one? Just a thought...
-            $.each(e.incorrect_answers,function(index,element){
-                $("<label class='radio'>").html(`<p>&nbsp;&nbsp;${atob(element)}</p>
-                <input type='radio' class='answer' name='question${i}'>
-                <span class='checkround'></span>`).appendTo(answerDiv);
-            });
-            $("<label class='radio'>").html(`<p>&nbsp;&nbsp;${atob(e.correct_answer)}</p>
-            <input type='radio' class='answer correctAnswer' name='question${i}'>
-            <span class='checkround'></span>`).appendTo(answerDiv);
+            let answers = [];
+            for (let i = 0; i < e.incorrect_answers.length; i++) {
+                answers.push({'correct': false, 'answer': e.incorrect_answers[i]});
+            }
+            answers.push({'correct': true, 'answer': e.correct_answer});
+            answers = shuffle(answers);
+
+            for (let j = 0; j < answers.length; j++) {
+                if (!answers[j].correct) {
+                    $("<label class='radio'>").html(`<p>&nbsp;&nbsp;${atob(answers[j].answer)}</p>
+                    <input type='radio' class='answer' name='question${i}'>
+                    <span class='checkround'></span>`).appendTo(answerDiv);
+                } else if (answers[j].correct) {
+                    $("<label class='radio'>").html(`<p>&nbsp;&nbsp;${atob(answers[j].answer)}</p>
+                    <input type='radio' class='answer correctAnswer' name='question${i}'>
+                    <span class='checkround'></span>`).appendTo(answerDiv);
+                }
+            }
         });
         var submit = $("<div class='text-center'><button class='btn btn-secondary'>Submit</button></div>").appendTo($("#questionsList"));
         
@@ -135,27 +147,24 @@
                     }
                })
 
-            alert("Well done, you got " + right + " right!\nYou also got a score of " + score);
+                alert("Well done, you got " + right + " right!\nYou also got a score of " + score);
 
-               // Clear HTML 
-               $("#questionsList").empty();
-                // currentQuestions = [];
-                // currentEasyCount = 4;
-                // currentMediumCount = 3;
-                // currentHardCount = 3;
+                // Clear HTML 
+                $("#questionsList").empty();
             
                 currentQuestions = [];
-                // score += (right + (right-10));
                 // Temp - Reset score
                 score = 19;
+                
+                // Get new questions
                 getQuestions();
-               
-               // Get new questions
 
            }
-        });
+    });
 
-    }
+    // Debug line
+    if (debug) $('.correctAnswer').siblings().css('color', 'white').parent().css('background-color', 'green');
+}
 
     // Took this shuffle function from here:
     // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
