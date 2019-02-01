@@ -18,6 +18,7 @@
             console.log(data);
             buildQuestionList(data);
         });
+
     }
 
     function getQuestions() {
@@ -85,42 +86,51 @@
             // TODO why is this code wrong? There are a LOT of reasons, but a
             // *hint* is to consider how someone with developer tools might get
             // a perfect score every time.
-           var question = $("<div/>").addClass(`question border border-primary p-3 difficulty-${e.difficulty}`).appendTo($("#questionsList"));
-           $("<h6/>").addClass("text-center").html("Question " + (i+1)).appendTo(question);
-           $("<span style='display:block'/>").html("Difficulty: " + atob(e.difficulty).toUpperCase()).appendTo(question);
-           $("<span/>").addClass("text-secondary").html(atob(e.question)).appendTo(question);
-           var answerDiv = $("<div/>").addClass("row answerDiv").appendTo(question);
-           // TODO wouldn't it be better to shuffle the answers so that the
+            var question = $(`<br><br><div class='question difficulty-${e.difficulty}'/>`).appendTo($("#questionsList"));
+
+            $(`<div class='text-center'><span style='display:block' class='difficulty'>Difficulty : <em>${atob(e.difficulty)}</em></span></div>`).appendTo(question);
+            $("<span/>").addClass("questionNumber").html(`${i+1}&nbsp;&nbsp;&nbsp;`).appendTo(question);
+            $("<span/>").addClass("questionText").html(atob(e.question)).appendTo(question);
+            $("<br><br>").appendTo(question);
+            var answerDiv = $("<div/>").addClass("answerDiv").appendTo(question);
+
+            // TODO wouldn't it be better to shuffle the answers so that the
             // last one isn't always the right one? Just a thought...
-           $.each(e.incorrect_answers,function(index,element){
-               $("<button/>").addClass("btn btn-primary form-control col-3 answer").html(atob(element)).appendTo(answerDiv);
-           });
-           $("<button/>").addClass("btn btn-primary form-control col-3 correctAnswer answer").html(atob(e.correct_answer)).appendTo(answerDiv);
+            $.each(e.incorrect_answers,function(index,element){
+                $("<label class='radio'>").html(`<p>&nbsp;&nbsp;${atob(element)}</p>
+                <input type='radio' class='answer' name='question${i}'>
+                <span class='checkround'></span>`).appendTo(answerDiv);
+            });
+            $("<label class='radio'>").html(`<p>&nbsp;&nbsp;${atob(e.correct_answer)}</p>
+            <input type='radio' class='answer correctAnswer' name='question${i}'>
+            <span class='checkround'></span>`).appendTo(answerDiv);
         });
-        var submit = $("<button/>").addClass("btn btn-secondary text-center form-control").html("Submit").appendTo($("#questionsList"));
+        var submit = $("<div class='text-center'><button class='btn btn-secondary'>Submit</button></div>").appendTo($("#questionsList"));
+        
         submit.click(function(e) {
            e.preventDefault(); 
            // TODO there is probably a better way to determine the right
-            // answer.
-           var len = $(".btn-info").length;
-           if (len < 10) {
-               alert("Please complete all ten questions to submit.")
+           // answer.
+           const selectedAnswers = $("input:checked");
+           if (selectedAnswers.length < 10) {
+               alert("Please complete all ten questions to submit.");
            } else {
-               let correctAnswers = $(".btn-info.correctAnswer");
+               // Get all correct selected answers
+               const correctAnswers = $('input:checked.correctAnswer');
                const right = correctAnswers.length;
                
                score = 0;
                correctAnswers.each(function(index){
                    // Easy
-                    if (($(this).parent().parent()).hasClass("difficulty-ZWFzeQ==")) {
+                    if (($(this).parent().parent().parent().hasClass("difficulty-ZWFzeQ=="))) {
                         score += 1;
                     }
                    // Medium
-                    if (($(this).parent().parent()).hasClass("difficulty-bWVkaXVt")) {
+                    if (($(this).parent().parent().parent()).hasClass("difficulty-bWVkaXVt")) {
                         score += 2;
                     }
                     // Hard 
-                    if (($(this).parent().parent()).hasClass("difficulty-aGFyZA==")) {
+                    if (($(this).parent().parent().parent()).hasClass("difficulty-aGFyZA==")) {
                         score += 3;
                     }
                })
@@ -144,13 +154,7 @@
 
            }
         });
-        $(".answer").click(function(e) {
-           e.preventDefault(); 
-           $(this).parent().children().removeClass('btn-info');
-           $(this).parent().children().addClass('btn-primary');
-           $(this).addClass("btn-info");
-           $(this).removeClass("btn-primary");
-        });
+
     }
 
     // Took this shuffle function from here:
